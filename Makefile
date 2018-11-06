@@ -4,7 +4,7 @@ default: all
 all: genesis-indel 
 
 genesis:
-	$(CXX) $(INCLUDE) src/genesis-indel.cpp -o bin/genesis-indel -lpthread
+	$(CXX) src/genesis-indel.cpp -o bin/genesis-indel -lpthread
 
 clean:
 	rm -f bin/genesis-indel
