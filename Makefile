@@ -1,8 +1,5 @@
 CXX = g++ -std=c++11 
 
-default: all
-all: genesis-indel 
-
 genesis:
 	$(CXX) src/genesis-indel.cpp -o bin/genesis-indel -lpthread
 
