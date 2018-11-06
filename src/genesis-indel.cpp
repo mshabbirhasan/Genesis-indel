@@ -28,7 +28,7 @@ string createTempDir() {
 }
 
 void remove_temp_dir(string temp_dir_name) {
-  if (rmdir(temp_dir_name) == -1) {
+  if (rmdir(temp_dir_name.c_str()) == -1) {
     cerr << "ERROR: Failed to delete the temp directory: " << temp_dir_name << endl;
     exit(-1);
   }
