@@ -27,6 +27,8 @@ Genesis-indel is a computational pipeline to explore the unmapped reads to ident
 
 ``` samtools index input.bam ``` 
 
+***Note:*** samtools is included in the ext/ directory.
+
 **2. Reference genome in FASTA format.**
 > There should be corresponding index files (.fai, .amb, .ann, .bwt, .pac, .sa) of the input FASTA in the same directory. You can create the index files using the follwoing commands:
 
@@ -35,6 +37,8 @@ Genesis-indel is a computational pipeline to explore the unmapped reads to ident
 ``` bwa index reference.fasta ```
 
 ***Note:*** You need to create the index for reference only once.
+
+***Note:*** bwa is included in the ext/directory.
 
 ### Output: 
 **A VCF file containing the novel high-quality variants.**
