@@ -39,7 +39,7 @@ bwa index reference.fasta
 
 ***Note:*** You need to create the index for reference only once.
 
-***Note:*** bwa is included in the ext/directory.
+***Note:*** bwa is included in the ext/ directory.
 
 ### Output: 
 **A VCF file containing the novel high-quality variants.**
