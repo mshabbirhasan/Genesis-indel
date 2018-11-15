@@ -7,9 +7,9 @@ Genesis-indel is a computational pipeline to explore the unmapped reads to ident
 ###### Email: shabbir5@vt.edu
 
 ## System Requirement
-    - gcc: 4.9 or above
-    - jdk: 1.8 or above
-    - python: Python 2.6 or above
+- gcc: 4.9 or above
+- jdk: 1.8 or above
+- python: Python 2.6 or above
 ## Build and Install
 **Step 1:** 
     ```make clean``` // This will remove previous binaries.
