@@ -12,13 +12,27 @@ Genesis-indel is a computational pipeline to explore the unmapped reads to ident
     - python: Python 2.6 or above
 ## Build and Install
 **Step 1:** 
-    ```make clean```
+    ```make clean``` // This will remove previous binaries.
     
 **Step 2:**
-    ``` make ```
+    ``` make ``` // This will create binaries in the bin/ directory.
     
 **Step 3:**
-    ``` make install ```
+    ``` make install ``` // This will give executable permission to the external binaries.
 
 ## Run Genesis-indel
-**Input:** alignment file in BAM format
+**Input:** alignment file in BAM format.
+> There should be a corresponding index file (.bai file) of the input BAM in the same direcory. You can create an index file using the following command:
+
+``` samtools index input.bam ``` 
+
+**Input:** reference genome in FASTA format.
+> There should be corresponding index files (.fai, .amb, .ann, .bwt, .pac, .sa) of the input FASTA in the same directory. You can create the index files using the follwoing commands:
+
+``` samtools faidx reference.fasta ```
+
+``` bwa index reference.fasta ```
+
+**Note:** You need to create the index for reference only once.
+
+**Output:** a VCF file containing the novel high-quality variants.
