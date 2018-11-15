@@ -21,18 +21,34 @@ Genesis-indel is a computational pipeline to explore the unmapped reads to ident
     ``` make install ``` // This will give executable permission to the external binaries.
 
 ## Run Genesis-indel
-**Input:** alignment file in BAM format.
+### Input: 
+**1. Alignment file in BAM format.**
 > There should be a corresponding index file (.bai file) of the input BAM in the same direcory. You can create an index file using the following command:
 
 ``` samtools index input.bam ``` 
 
-**Input:** reference genome in FASTA format.
+**2. Reference genome in FASTA format.**
 > There should be corresponding index files (.fai, .amb, .ann, .bwt, .pac, .sa) of the input FASTA in the same directory. You can create the index files using the follwoing commands:
 
 ``` samtools faidx reference.fasta ```
 
 ``` bwa index reference.fasta ```
 
-**Note:** You need to create the index for reference only once.
+***Note:*** You need to create the index for reference only once.
 
-**Output:** a VCF file containing the novel high-quality variants.
+### Output: 
+**A VCF file containing the novel high-quality variants.**
+
+## Example
+``` ./genesis-indel input.bam reference.fasta output.vcf -reportSNP=false ```
+
+This command will report novel high-quality indels only.
+
+``` ./genesis-indel input.bam reference.fasta output.vcf -reportSNP=false ```
+
+This command will report both novel high-quality SNPs and indels.
+
+## Citing Genesis-indel
+If you use Genesis-indel, please cite the following paper:
+
+Mohammad Shabbir Hasan, Xiaowei Wu, and Liqing Zhang. "Uncovering missed indels by leveraging unmapped reads." TBD.
