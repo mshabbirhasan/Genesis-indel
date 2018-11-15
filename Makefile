@@ -18,4 +18,7 @@ extract_novel_high_quality_variant:
 clean:
 	rm -f bin/*
 
+install:
+	chmod a+x ext/blat ext/bwa ext/pslToBed ext/samtools ext/bedtools
+
 .phony: clean default
