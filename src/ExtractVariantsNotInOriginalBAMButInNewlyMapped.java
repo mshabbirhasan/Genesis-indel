@@ -48,7 +48,10 @@ public class ExtractVariantsNotInOriginalBAMButInNewlyMapped {
     FileWriter fileWriter = new FileWriter(outputFileName);
     
     while((line = bufferedReader.readLine()) != null){
-      if(!line.startsWith("#")){
+      if(line.startsWith("#")){
+        fileWriter.write(line + "\n");
+      }
+      else{
         String lineArray[] = line.split("\t");      
         String chr = lineArray[0];
         String position = lineArray[1];

@@ -60,7 +60,8 @@ int main(int argc, char* *argv) {
   string reference_genome = argv[2];
   string output_file_name = argv[3];
   string reportSNP = argv[4];
-  transform(reportSNP.begin(), reportSNP.end(), reportSNP.begin(), ::tolower);
+  string flag = reportSNP.substr(11, reportSNP.length());
+  transform(flag.begin(), flag.end(), flag.begin(), ::tolower);
 
   string input_bam_base_name_with_extension = input_bam.substr(input_bam.find_last_of("\\/") + 1);
   string str(input_bam_base_name_with_extension);
@@ -173,7 +174,7 @@ int main(int argc, char* *argv) {
   call_variant_from_original_bam.join();
   call_variant_from_new_bam.join();
 
-  if (reportSNP == "false") {
+  if (flag == "false") {
     // extract indel from Platypus VCF for originally mapped reads and also from newly mapped reads
     string command_to_extract_indel_from_variants_of_original_bam = "java ExtractIndelsFromPlatypusVCF "
             + temp_dir_name + "/" + input_bam_base_name + "_original_bam_variant.vcf";
@@ -202,7 +203,7 @@ int main(int argc, char* *argv) {
     // copy the novel high-quality indels to output
     string novel_high_quality_indel_file_name = temp_dir_name + "/" + input_bam_base_name + "_novel_indel_PASS_filtered.vcf";
     copy_output(novel_high_quality_indel_file_name, output_file_name);
-  } else if (reportSNP == "true") {
+  } else if (flag == "true") {
     // extract novel SNPs and indels
     string command_to_extract_novel_snp_and_indel = "java ExtractVariantsNotInOriginalBAMButInNewlyMapped "
             + temp_dir_name + "/" + input_bam_base_name + "_original_bam_variant.vcf "
