@@ -5,13 +5,16 @@
 #include <unistd.h>
 #include <cstring>
 #include <algorithm>
+#include <dirent.h>
+#include <vector>
+#include <memory>
 
 using namespace std;
 
 void execute(string command) {
   int status = system(command.c_str());
   if (status < 0) {
-    cerr << "Error: error while executing the command: " << command << endl;
+    cerr << "Error: error while executing the command " << command << strerror(errno) << endl;
     exit(-1);
   }
 }
@@ -21,16 +24,43 @@ string createTempDir() {
   char* temp_dir_name = mkdtemp(temp_dir_template);
 
   if (temp_dir_name == NULL) {
-    cerr << "ERROR: Failed creating the temp directory: " << temp_dir_template << endl;
+    cerr << "ERROR: Failed creating the temp directory " << temp_dir_template << " : " << strerror(errno) << endl;
     exit(-1);
   }
-
   return temp_dir_name;
 }
 
+vector<string> get_file_list(string directory_name) {
+  vector<string> files;
+  shared_ptr<DIR> directory_ptr(opendir(directory_name.c_str()), [](DIR * directory_name) {
+    directory_name && closedir(directory_name); });
+  struct dirent *dirent_ptr;
+  if (!directory_ptr) {
+    cout << "ERROR: Can not open directory " << directory_name << " : " << strerror(errno) << endl;
+    return files; // returns an empty vector
+  }
+
+  while ((dirent_ptr = readdir(directory_ptr.get())) != nullptr) {
+    string file_name = string(dirent_ptr -> d_name);
+    if (file_name != "." && file_name != "..") {
+      files.push_back(file_name);
+    }
+  }
+  return files;
+}
+
 void remove_temp_dir(string temp_dir_name) {
+  vector<string> files = get_file_list(temp_dir_name);
+  for (const auto& file : files) {
+    string file_to_delete = temp_dir_name + "/" + file;
+    if (remove(file_to_delete.c_str()) != 0) {
+      cerr << "ERROR: Failed to delete the temp file " << file_to_delete << " : " << strerror(errno) << endl;
+      exit(-1);
+    }
+  }
+
   if (rmdir(temp_dir_name.c_str()) == -1) {
-    cerr << "ERROR: Failed to delete the temp directory: " << temp_dir_name << endl;
+    cerr << "ERROR: Failed to delete the temp directory " << temp_dir_name << " : " << strerror(errno) << endl;
     exit(-1);
   }
 }
@@ -40,12 +70,11 @@ void copy_output(string srcFile, string dstFile) {
   ofstream dst(dstFile, ios::binary);
 
   if (!(dst << src.rdbuf())) {
-    cerr << "ERROR: Failed to copy output to the output file: " << srcFile << endl;
+    cerr << "ERROR: Failed to copy output " << srcFile << " to the output file " << dstFile << " : " << strerror(errno) << endl;
     src.close();
     dst.close();
     exit(-1);
   }
-
   src.close();
   dst.close();
 }
@@ -71,17 +100,10 @@ int main(int argc, char* *argv) {
   // create a temp directory
   string temp_dir_name = createTempDir();
 
-  // split the input BAM file into mapped and unmapped bam file
-  /*string command_to_split_input_bam_to_mapped_bam = "../ext/samtools view -b -F 0x04 " + input_bam + " > "
-          + temp_dir_name + "/" + input_bam_base_name + "_mapped-reads.bam";*/
-  string command_to_split_input_bam_to_unmapped_bam = "../ext/samtools view -b -f 0x04 " + input_bam + " > "
+  // extract the unmapped bam from the input bam
+  string command_to_extract_unmapped_bam_from_input_bam = "../ext/samtools view -b -f 0x04 " + input_bam + " > "
           + temp_dir_name + "/" + input_bam_base_name + "_unmapped-reads.bam";
-
-  //thread split_to_mapped_bam(execute, command_to_split_input_bam_to_mapped_bam);
-  thread split_to_unmapped_bam(execute, command_to_split_input_bam_to_unmapped_bam);
-
-  //split_to_mapped_bam.join(); // pauses until split_to_mapped_bam finishes
-  split_to_unmapped_bam.join(); // pauses until split_to_unmapped_bam finishes  
+  execute(command_to_extract_unmapped_bam_from_input_bam);
 
   // get reads from the originally unmapped bam file
   string command_to_extract_reads_from_originally_unmapped_bam = "../ext/samtools bam2fq "
@@ -196,7 +218,7 @@ int main(int argc, char* *argv) {
     execute(command_to_extract_novel_indel);
 
     // extract novel high-quality indels are report it in the output
-    string command_to_extract_novel_high_quality_indel = "java ExtractVariantsWithPassFlagFromAVCF " 
+    string command_to_extract_novel_high_quality_indel = "java ExtractVariantsWithPassFlagFromAVCF "
             + temp_dir_name + "/" + input_bam_base_name + "_novel_indel.vcf";
     execute(command_to_extract_novel_high_quality_indel);
 
@@ -208,17 +230,17 @@ int main(int argc, char* *argv) {
     string command_to_extract_novel_snp_and_indel = "java ExtractVariantsNotInOriginalBAMButInNewlyMapped "
             + temp_dir_name + "/" + input_bam_base_name + "_original_bam_variant.vcf "
             + temp_dir_name + "/" + input_bam_base_name + "_originally_unmapped_newly_mapped_sorted_dedup_variants.vcf "
-            + temp_dir_name + "/" + input_bam_base_name + "_novel_SNP_and_indel.vcf";    
+            + temp_dir_name + "/" + input_bam_base_name + "_novel_SNP_and_indel.vcf";
     execute(command_to_extract_novel_snp_and_indel);
-    
+
     // extract novel high-quality SNPs and indels
-    string command_to_extract_novel_high_quality_snp_and_indel = "java ExtractVariantsWithPassFlagFromAVCF " 
+    string command_to_extract_novel_high_quality_snp_and_indel = "java ExtractVariantsWithPassFlagFromAVCF "
             + temp_dir_name + "/" + input_bam_base_name + "_novel_SNP_and_indel.vcf";
     execute(command_to_extract_novel_high_quality_snp_and_indel);
- 
+
     // copy the novel high-quality indels to output
     string novel_high_quality_SNP_and_indel_file_name = temp_dir_name + "/" + input_bam_base_name + "_novel_SNP_and_indel_PASS_filtered.vcf";
-    copy_output(novel_high_quality_SNP_and_indel_file_name, output_file_name);    
+    copy_output(novel_high_quality_SNP_and_indel_file_name, output_file_name);
   }
 
   // remove temp directory
