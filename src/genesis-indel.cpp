@@ -37,7 +37,7 @@ vector<string> get_file_list(string directory_name) {
   struct dirent *dirent_ptr;
   if (!directory_ptr) {
     cout << "ERROR: Can not open directory " << directory_name << " : " << strerror(errno) << endl;
-    return files; // returns an empty vector
+    exit(-1); // returns an empty vector
   }
 
   while ((dirent_ptr = readdir(directory_ptr.get())) != nullptr) {
