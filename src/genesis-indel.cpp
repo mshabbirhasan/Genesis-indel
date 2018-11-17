@@ -81,7 +81,7 @@ void copy_output(string srcFile, string dstFile) {
 
 int main(int argc, char* *argv) {
   if (argc != 5) {
-    cerr << "USAGE: genesis-indel INPUT.BAM REFERENCE.FA OUTPUT_FILENAME -reportSNP=false\n";
+    cerr << "USAGE: genesis-indel INPUT.BAM REFERENCE.FA OUTPUT_FILENAME.VCF -reportSNP=false\n";
     exit(-1);
   }
 
