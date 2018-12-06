@@ -18,7 +18,7 @@ Genesis-indel is a computational pipeline to explore the unmapped reads to ident
 - bwa: version 0.7.15 or above (Can be downloaded from https://github.com/lh3/bwa)
 - samtools: version 1.4 or above (Can be downloaded from http://www.htslib.org/)
 
-**Precompiled executables are provided in ext/ that are tested to work in Ubuntu 14.04 LTS.**
+**Precompiled executables are provided in the ext/ directory that are tested to work in Ubuntu 14.04 LTS.**
 
 ## Build and install
 ### Preparation:
