@@ -10,10 +10,24 @@ Genesis-indel is a computational pipeline to explore the unmapped reads to ident
 **Email: shabbir5@vt.edu**
 
 ## System Requirement
-- gcc: 4.9 or above
-- jdk: 1.8 or above
+- gcc: version 4.9 or above
+- jdk: version 1.8 or above
 - python: Python 2.6 or above
-## Build and Install
+- bedtools: version 2.27 or above (Can be downloaded from https://bedtools.readthedocs.io/en/latest/content/installation.html)
+- blat: version 36 X 2 or above (Executables can be downloaded from http://hgdownload.soe.ucsc.edu/admin/exe/)
+- bwa: version 0.7.15 or above (Can be downloaded from https://github.com/lh3/bwa)
+- samtools: version 1.4 or above (Can be downloaded from http://www.htslib.org/)
+
+**Precompiled executables are provided in ext/ that are tested to work in Ubuntu 14.04 LTS.**
+
+## Build and install
+### Preparation:
+- After you download and install bedtools, add bedtools to $PATH variable using the command 
+    ```PATH=path_to_bedtools_bin:$PATH```.
+    **Alternatively**, if you use the precompiled bedtools executable provided in ext/, you can add it to the $PATH variable as follows:
+        ```PATH=ext/:$PATH```. This will add other precompiled executables provided in ext/ to the $PATH variable.
+- Add blat, bwa, and samtools to the $PATH variable in the same way.
+### Build and install        
 **Step 1:** 
     ```make clean``` // This will remove previous binaries.
     
