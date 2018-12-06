@@ -101,12 +101,12 @@ int main(int argc, char* *argv) {
   string temp_dir_name = createTempDir();
 
   // extract the unmapped bam from the input bam
-  string command_to_extract_unmapped_bam_from_input_bam = "../ext/samtools view -b -f 0x04 " + input_bam + " > "
+  string command_to_extract_unmapped_bam_from_input_bam = "samtools view -b -f 0x04 " + input_bam + " > "
           + temp_dir_name + "/" + input_bam_base_name + "_unmapped-reads.bam";
   execute(command_to_extract_unmapped_bam_from_input_bam);
 
   // get reads from the originally unmapped bam file
-  string command_to_extract_reads_from_originally_unmapped_bam = "../ext/samtools bam2fq "
+  string command_to_extract_reads_from_originally_unmapped_bam = "samtools bam2fq "
           + temp_dir_name + "/" + input_bam_base_name + "_unmapped-reads.bam > "
           + temp_dir_name + "/" + input_bam_base_name + "_unmapped-reads.fq";
   execute(command_to_extract_reads_from_originally_unmapped_bam);
@@ -119,25 +119,25 @@ int main(int argc, char* *argv) {
   execute(command_to_trim_unmapped_read_using_trimmomatic);
 
   // map the trimmed reads from the originally unmapped reads to the reference using BWA-MEM
-  string command_to_map_originally_unampped_read_to_reference_genome = "../ext/bwa mem -t 32 " + reference_genome + " "
-          + temp_dir_name + "/" + input_bam_base_name + "_unmapped-reads-trimmed-TruSeq2-SE.fq | ../ext/samtools view -bT "
+  string command_to_map_originally_unampped_read_to_reference_genome = "bwa mem -t 32 " + reference_genome + " "
+          + temp_dir_name + "/" + input_bam_base_name + "_unmapped-reads-trimmed-TruSeq2-SE.fq | samtools view -bT "
           + reference_genome + " - > " + temp_dir_name + "/" + input_bam_base_name + "_originally_unmapped_newly_mapped.bam";
   execute(command_to_map_originally_unampped_read_to_reference_genome);
 
   // extract reads that are still unmapped after BWA-MEM
-  string command_to_extract_still_unmapped_reads_after_BWA_MEM = "../ext/samtools view -b -f 0x04 "
+  string command_to_extract_still_unmapped_reads_after_BWA_MEM = "samtools view -b -f 0x04 "
           + temp_dir_name + "/" + input_bam_base_name + "_originally_unmapped_newly_mapped.bam > "
           + temp_dir_name + "/" + input_bam_base_name + "_still_unmapped_after_BWA-MEM.bam";
   execute(command_to_extract_still_unmapped_reads_after_BWA_MEM);
 
   // convert still unmapped reads to fasta
-  string command_to_convert_still_unammped_reads_to_fasta = "../ext/samtools fasta "
+  string command_to_convert_still_unammped_reads_to_fasta = "samtools fasta "
           + temp_dir_name + "/" + input_bam_base_name + "_still_unmapped_after_BWA-MEM.bam > "
           + temp_dir_name + "/" + input_bam_base_name + "_still_unmapped_after_BWA-MEM.fasta";
   execute(command_to_convert_still_unammped_reads_to_fasta);
 
   // run BLAT for still unmapped reads
-  string command_to_align_still_unmapped_reads_using_BLAT = "../ext/blat " + reference_genome + " "
+  string command_to_align_still_unmapped_reads_using_BLAT = "blat " + reference_genome + " "
           + temp_dir_name + "/" + input_bam_base_name + "_still_unmapped_after_BWA-MEM.fasta "
           + temp_dir_name + "/" + input_bam_base_name + "_still_unmapped_after_BWA-MEM_aligned_by_BLAT.psl";
   execute(command_to_align_still_unmapped_reads_using_BLAT);
@@ -151,20 +151,20 @@ int main(int argc, char* *argv) {
   // convert BED to BAM
   string command_to_get_the_chromosome_size = "awk -v OFS='\t' {'print $1, $2'} " + reference_genome + ".fai > " + temp_dir_name + "/chr_size.txt";
   execute(command_to_get_the_chromosome_size);
-  string command_to_convert_bed_to_bam = "../ext/bedtools bedtobam -bed12 -i "
+  string command_to_convert_bed_to_bam = "bedtools bedtobam -bed12 -i "
           + temp_dir_name + "/" + input_bam_base_name + "_still_unmapped_after_BWA-MEM_aligned_by_BLAT.bed -g "
           + temp_dir_name + "/chr_size.txt > " + temp_dir_name + "/" + input_bam_base_name + "_still_unmapped_after_BWA-MEM_aligned_by_BLAT.bam";
   execute(command_to_convert_bed_to_bam);
 
   // merge BAM from BWA-MEM and BAM from BLAT
-  string command_to_merge_bwa_mem_bam_and_blat_mem = "../ext/samtools merge -f "
+  string command_to_merge_bwa_mem_bam_and_blat_mem = "samtools merge -f "
           + temp_dir_name + "/" + input_bam_base_name + "_BWA-MEM_and_BLAT_merged.bam "
           + temp_dir_name + "/" + input_bam_base_name + "_originally_unmapped_newly_mapped.bam "
           + temp_dir_name + "/" + input_bam_base_name + "_still_unmapped_after_BWA-MEM_aligned_by_BLAT.bam";
   execute(command_to_merge_bwa_mem_bam_and_blat_mem);
 
   // sort the newly mapped bam file
-  string command_to_sort_newly_mapped_bam = "../ext/samtools sort -@ 4 "
+  string command_to_sort_newly_mapped_bam = "samtools sort -@ 4 "
           + temp_dir_name + "/" + input_bam_base_name + "_originally_unmapped_newly_mapped.bam -o "
           + temp_dir_name + "/" + input_bam_base_name + "_originally_unmapped_newly_mapped_sorted.bam";
   execute(command_to_sort_newly_mapped_bam);
@@ -177,7 +177,7 @@ int main(int argc, char* *argv) {
   execute(command_to_mark_pcr_duplicate);
 
   // index the originally unmapped newly mapped sorted dedup bam file
-  string command_to_index_merged_bam_file = "../ext/samtools index "
+  string command_to_index_merged_bam_file = "samtools index "
           + temp_dir_name + "/" + input_bam_base_name + "_originally_unmapped_newly_mapped_sorted_dedup.bam";
   execute(command_to_index_merged_bam_file);
 
